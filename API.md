@@ -572,7 +572,7 @@ console.log(`${stats.image_count} images, ${stats.storage_used_mb.toFixed(1)} MB
 | `401` | Unauthorized | `X-API-Key` header is missing entirely |
 | `403` | Forbidden | Token is wrong; or `Origin`/`Referer` does not match the tenant's registered URL; or no origin is configured for the tenant |
 | `404` | Not Found | Tenant name or image ID does not exist |
-| `408` | Request Timeout | Request took longer than 30 seconds |
+| `408` | Request Timeout | Request took longer than the route timeout (30 s for most routes, 120 s for uploads) |
 | `413` | Payload Too Large | File exceeds the configured maximum upload size |
 | `415` | Unsupported Media Type | File type is not JPEG/PNG/WebP/GIF, or the file content does not match its declared type |
 | `429` | Too Many Requests | Global rate limit (500 req/min per IP), per-tenant image fetch limit, image count quota, or storage quota exceeded |
