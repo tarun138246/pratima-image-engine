@@ -23,7 +23,7 @@ Every tenant endpoint requires the **`X-API-Key`** header carrying the tenant's 
 X-API-Key: a3f9d2c8e1b047fabe0293d1...
 ```
 
-The token is generated once when the tenant is created via `pratima create tenant <name>`.  
+The token is generated once when the tenant is created via `pratima create-tenant <name>`.  
 If lost, regenerate it with `pratima token-regen <name>` — the old token stops working immediately.
 
 ### Origin enforcement

@@ -195,8 +195,8 @@ source ~/.bashrc
 #### Create a tenant
 
 ```bash
-pratima create tenant <name>
-pratima create tenant <name> --origin https://yourfrontend.com
+pratima create-tenant <name>
+pratima create-tenant <name> --origin "https://yourfrontend.com,http://localhost:5173"
 ```
 
 On creation the engine prints the API token **once**. Copy it immediately — it is not stored in plaintext anywhere you can retrieve it in full later.
@@ -229,14 +229,14 @@ The engine checks the `Origin` and `Referer` headers on every request against th
 #### List tenants
 
 ```bash
-pratima list tenants
+pratima list-tenants
 ```
 
 #### Delete a tenant
 
 ```bash
-pratima delete tenant <name>
-pratima delete tenant <name> --force    # skip confirmation
+pratima delete-tenant <name>
+pratima delete-tenant <name> --force    # skip confirmation
 ```
 
 This permanently removes all images and DB records for the tenant.
