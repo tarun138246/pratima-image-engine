@@ -84,6 +84,7 @@ Upload an image. The engine scans it with ClamAV, verifies the file content matc
 |---|---|---|---|---|
 | `image` | File | Yes* | JPEG, PNG, WebP, GIF. Max size set by server (default 10 MB) | The image to upload. Use `file` if your form already uses that name |
 | `file` | File | Yes* | Same as above | Alternative field name — either `image` or `file`, not both |
+| `imageId` | Text | No | Letters, numbers, hyphens, underscores. Max 128 chars. Must be unique per tenant | Custom image ID. If omitted, Pratima auto-generates one |
 | `alt` | Text | No | Max 500 characters | Alt text for accessibility and SEO |
 | `title` | Text | No | Max 255 characters | Descriptive title for the image |
 
@@ -93,9 +94,11 @@ Upload an image. The engine scans it with ClamAV, verifies the file content matc
 
 ```js
 const formData = new FormData();
-formData.append('image', fileInput.files[0]);
-formData.append('alt',   'Handmade ceramic mug');
-formData.append('title', 'Blue glaze product shot');
+formData.append('image',   fileInput.files[0]);
+formData.append('alt',     'Handmade ceramic mug');
+formData.append('title',   'Blue glaze product shot');
+// Optional: pass your own ID (e.g. your DB record ID) — must be unique per tenant
+// formData.append('imageId', 'product-42-hero');
 
 const response = await fetch('https://img.yourdomain.com/upload/myshop', {
   method:  'POST',
@@ -105,6 +108,7 @@ const response = await fetch('https://img.yourdomain.com/upload/myshop', {
 
 const data = await response.json();
 console.log(data.url); // ready to use in <img src>
+console.log(data.id);  // auto-generated or your custom ID
 ```
 
 #### Example — JavaScript (Node.js / server-side)
@@ -147,8 +151,8 @@ curl -X POST https://img.yourdomain.com/upload/myshop \
 ```json
 {
   "success": true,
-  "id":      "pratima-mys-20240626143012-A3F9D2C8",
-  "url":     "https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8",
+  "id":      "product-42-hero",
+  "url":     "https://img.yourdomain.com/image/myshop/product-42-hero",
   "tenant":  "myshop",
   "alt":     "Handmade ceramic mug",
   "title":   "Blue glaze product shot"
@@ -157,15 +161,19 @@ curl -X POST https://img.yourdomain.com/upload/myshop \
 
 > **202 vs 200** — The engine returns 202 because WebP conversion is asynchronous. The image is immediately serveable from RAM cache; the final WebP file is written to disk within seconds.
 
+> **Custom IDs** — If you pass `imageId` in the form, the `id` in the response will be exactly what you sent. If you omit it, Pratima auto-generates one in the format `pratima-<prefix>-<timestamp>-<hex>`.
+
 #### Error responses
 
 | Status | Condition |
 |---|---|
 | `400` | No image field found in the form |
+| `400` | `imageId` contains invalid characters or exceeds 128 chars |
 | `400` | File rejected by malware scan (ClamAV) |
 | `401` | `X-API-Key` header is missing |
 | `403` | Token is wrong or origin does not match the tenant's allowed origin |
 | `404` | Tenant name does not exist |
+| `409` | The provided `imageId` already exists for this tenant |
 | `413` | File exceeds the server's maximum upload size |
 | `415` | File type not allowed, or file content does not match its declared MIME type |
 | `429` | Tenant has reached its image count limit or storage quota |
