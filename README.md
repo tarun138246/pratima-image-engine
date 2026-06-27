@@ -209,19 +209,22 @@ On creation the engine prints the API token **once**. Copy it immediately — it
   └─────────────────────────────────────────────────────────────────┘
 
   Save this token — it will not be shown again.
-  Next step: pratima tenant set-origin myshop https://myshop.com
+  Next step: pratima set-origin myshop https://myshop.com
 ```
 
-#### Set the allowed frontend origin
+#### Set the allowed frontend origin(s)
 
 ```bash
-pratima tenant set-origin <name> <url>
+pratima set-origin <name> <url> [url2 ...]
 
-# Example
-pratima tenant set-origin myshop https://myshop.com
+# Single origin
+pratima set-origin myshop https://myshop.com
+
+# Multiple origins (prod + local dev)
+pratima set-origin myshop https://myshop.com http://localhost:5173
 ```
 
-The engine checks the `Origin` and `Referer` headers on every request against this value. Requests from other origins are rejected with HTTP 403, even if the API token is correct.
+The engine checks the `Origin` and `Referer` headers on every request against the registered list. Requests from unlisted origins are rejected with HTTP 403, even if the API token is correct.
 
 #### List tenants
 
@@ -245,14 +248,14 @@ This permanently removes all images and DB records for the tenant.
 #### Show current token
 
 ```bash
-pratima token show <tenant>
+pratima token-show <tenant>
 ```
 
 #### Regenerate token
 
 ```bash
-pratima token regenerate <tenant>
-pratima token regenerate <tenant> --force
+pratima token-regen <tenant>
+pratima token-regen <tenant> --force
 ```
 
 The old token stops working **immediately**. Update your frontend app before regenerating in production.
@@ -262,7 +265,7 @@ The old token stops working **immediately**. Update your frontend app before reg
 ### Quota management
 
 ```bash
-pratima tenant limits set <tenant> [options]
+pratima set-limits <tenant> [options]
 
 Options:
   --max-storage-use <mb>          Disk storage cap in MB
@@ -277,7 +280,7 @@ Options:
 Example:
 
 ```bash
-pratima tenant limits set myshop \
+pratima set-limits myshop \
   --max-storage-use 5120 \
   --max-img-limit 50000 \
   --max-img-per-min 500 \
@@ -621,7 +624,7 @@ sudo systemctl restart clamav-daemon
 # Check what origin is registered for the tenant
 pratima stats myshop
 # Update it
-pratima tenant set-origin myshop https://correct-origin.com
+pratima set-origin myshop https://correct-origin.com
 ```
 
 **413 on upload from nginx**

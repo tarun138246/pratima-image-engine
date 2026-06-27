@@ -24,11 +24,11 @@ X-API-Key: a3f9d2c8e1b047fabe0293d1...
 ```
 
 The token is generated once when the tenant is created via `pratima create tenant <name>`.  
-If lost, regenerate it with `pratima token regenerate <name>` — the old token stops working immediately.
+If lost, regenerate it with `pratima token-regen <name>` — the old token stops working immediately.
 
 ### Origin enforcement
 
-If the tenant has a registered allowed origin (set via `pratima tenant set-origin`), every request must also come from that origin:
+If the tenant has registered allowed origins (set via `pratima set-origin`), every request must also come from one of those origins:
 
 - For **JavaScript fetch / XHR** — the browser sends an `Origin` header automatically.
 - For **HTML `<img>` tags** — the browser sends a `Referer` header automatically.
@@ -588,7 +588,7 @@ console.log(`${stats.image_count} images, ${stats.storage_used_mb.toFixed(1)} MB
 ## Integration checklist
 
 - [ ] Store your API token in a server-side environment variable — never in frontend JavaScript or HTML source
-- [ ] Set the allowed origin with `pratima tenant set-origin <name> https://yourfrontend.com` before going live
+- [ ] Set the allowed origin with `pratima set-origin <name> https://yourfrontend.com` before going live
 - [ ] Use `<img>` tags with the returned URL directly — no token needed in the URL
 - [ ] Make upload calls from your backend (or a trusted edge function) so the token is not exposed
 - [ ] Save the returned `id` in your own database alongside whatever record the image belongs to
