@@ -148,6 +148,10 @@ curl -X POST https://img.yourdomain.com/upload/myshop \
 
 #### Success response — `202 Accepted`
 
+| Header | Value |
+|---|---|
+| `X-Image-Id` | The image ID (same as `id` in the body) — useful for intercepting before parsing JSON |
+
 ```json
 {
   "success": true,
@@ -161,7 +165,7 @@ curl -X POST https://img.yourdomain.com/upload/myshop \
 
 > **202 vs 200** — The engine returns 202 because WebP conversion is asynchronous. The image is immediately serveable from RAM cache; the final WebP file is written to disk within seconds.
 
-> **Custom IDs** — If you pass `imageId` in the form, the `id` in the response will be exactly what you sent. If you omit it, Pratima auto-generates one in the format `pratima-<prefix>-<timestamp>-<hex>`.
+> **Custom IDs** — If you pass `imageId` in the form, the `id` in the response will be exactly what you sent. If you omit it, Pratima auto-generates one in the format `pratima_<first-4-of-tenant>_<first-4-of-filename>` (e.g. `pratima_mysh_prod`). A short random hex suffix is appended if a collision is detected (e.g. `pratima_mysh_prod_a3f9d2c8`).
 
 #### Error responses
 
@@ -203,7 +207,7 @@ No `X-API-Key` needed in the URL. Authentication works one of two ways:
 
 ```html
 <img
-  src="https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8"
+  src="https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8"
   alt="Handmade ceramic mug"
   loading="lazy"
   width="800"
@@ -215,7 +219,7 @@ No `X-API-Key` needed in the URL. Authentication works one of two ways:
 
 ```css
 .hero {
-  background-image: url('https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8');
+  background-image: url('https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8');
 }
 ```
 
@@ -223,7 +227,7 @@ No `X-API-Key` needed in the URL. Authentication works one of two ways:
 
 ```js
 const response = await fetch(
-  'https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8',
+  'https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8',
   { headers: { 'X-API-Key': 'YOUR_TOKEN_HERE' } }
 );
 const blob = await response.blob();
@@ -272,7 +276,7 @@ Returns the stored metadata for a single image as JSON. Does not return the imag
 #### Example — cURL
 
 ```bash
-curl https://img.yourdomain.com/info/myshop/pratima-mys-20240626143012-A3F9D2C8 \
+curl https://img.yourdomain.com/info/myshop/pratima_mysh_prod_a3f9d2c8 \
   -H "X-API-Key: YOUR_TOKEN_HERE"
 ```
 
@@ -280,7 +284,7 @@ curl https://img.yourdomain.com/info/myshop/pratima-mys-20240626143012-A3F9D2C8 
 
 ```js
 const response = await fetch(
-  'https://img.yourdomain.com/info/myshop/pratima-mys-20240626143012-A3F9D2C8',
+  'https://img.yourdomain.com/info/myshop/pratima_mysh_prod_a3f9d2c8',
   { headers: { 'X-API-Key': 'YOUR_TOKEN_HERE' } }
 );
 const info = await response.json();
@@ -294,9 +298,9 @@ console.log(info.url);                 // ready-to-use image URL
 
 ```json
 {
-  "id":            "pratima-mys-20240626143012-A3F9D2C8",
+  "id":            "pratima_mysh_prod_a3f9d2c8",
   "tenant":        "myshop",
-  "url":           "https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8",
+  "url":           "https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8",
   "original_name": "product_photo.jpg",
   "alt":           "Handmade ceramic mug",
   "title":         "Blue glaze product shot",
@@ -400,9 +404,9 @@ if (result.page < result.total_pages) {
   "total_pages": 8,
   "images": [
     {
-      "id":            "pratima-mys-20240626143012-A3F9D2C8",
+      "id":            "pratima_mysh_prod_a3f9d2c8",
       "tenant":        "myshop",
-      "url":           "https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8",
+      "url":           "https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8",
       "original_name": "product_photo.jpg",
       "alt":           "Handmade ceramic mug",
       "title":         "Blue glaze product shot",
@@ -426,7 +430,7 @@ if (result.page < result.total_pages) {
 | `limit` | number | Items per page |
 | `total` | number | Total image count across all pages |
 | `total_pages` | number | Total number of pages |
-| `images` | array | Array of image objects (same shape as `/info`) |
+| `images` | array | Array of image objects. Same fields as `/info` except file size is returned as `size` (number of bytes) instead of `size_bytes` |
 
 #### Error responses
 
@@ -459,7 +463,7 @@ Permanently delete an image. Removes it from the RAM cache, disk, and database. 
 
 ```bash
 curl -X DELETE \
-  https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8 \
+  https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8 \
   -H "X-API-Key: YOUR_TOKEN_HERE"
 ```
 
@@ -467,7 +471,7 @@ curl -X DELETE \
 
 ```js
 const response = await fetch(
-  'https://img.yourdomain.com/image/myshop/pratima-mys-20240626143012-A3F9D2C8',
+  'https://img.yourdomain.com/image/myshop/pratima_mysh_prod_a3f9d2c8',
   {
     method:  'DELETE',
     headers: { 'X-API-Key': 'YOUR_TOKEN_HERE' }
@@ -485,7 +489,7 @@ if (response.ok) {
 ```json
 {
   "success": true,
-  "id":      "pratima-mys-20240626143012-A3F9D2C8"
+  "id":      "pratima_mysh_prod_a3f9d2c8"
 }
 ```
 
